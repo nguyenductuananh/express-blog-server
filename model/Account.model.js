@@ -7,6 +7,8 @@ const AccountSchema = new mongoose.Schema({
         $ref : String,
         $id : mongoose.Schema.Types.ObjectId
     }
+}, {
+    versionKey : false
 });
 
 const Account = mongoose.model("Account", AccountSchema, "Account");

@@ -10,6 +10,8 @@ const StatusScheme = new mongoose.Schema({
         $ref : String, 
         $id : mongoose.Schema.Types.ObjectId
     }
+}, {
+    versionKey : false
 });
 
 const Status = mongoose.model("Status", StatusScheme, "Status");
