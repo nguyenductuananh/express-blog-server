@@ -5,7 +5,7 @@ const StatusScheme = new mongoose.Schema({
     created : Date,
     title : String,
     imgPath : String,
-    category : Array,
+    categories : Array,
     user : {
         $ref : String, 
         $id : mongoose.Schema.Types.ObjectId
