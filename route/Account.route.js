@@ -2,6 +2,7 @@ const express = require("express");
 const route = express.Router();
 
 const Account = require("../model/Account.model");
+const User = require("../model/User.model");
 route.get("/", async (req, res) => {
   let filters = {};
   //Page filter
@@ -25,8 +26,13 @@ route.get("/:id", async (req, res) => {
 
 route.post("/", async function (req, res) {
   let package = req.body;
-  package = await Account.create(package);
-  res.send(package);
+  let account = await Account.findOne(package);
+  if (account) {
+    let user = await User.findOne(account.user.$id);
+    res.send(user);
+  } else {
+    res.send({});
+  }
 });
 
 route.put("/", async function (req, res) {

@@ -4,26 +4,28 @@ const route = express.Router();
 const Status = require("../model/Status.model");
 route.get("/", async (req, res) => {
   let filters = {};
-
-  //Page filter
+  let obj = {};
+  //Page
   filters.page = parseInt(req.query.page) || 0;
 
   //Limit per page
   filters.limit = parseInt(req.query.limit) || 6;
 
-  //Filter with category
-  filters.category = req.query.category || "";
-  let package = await Status.find(
-    filters.category ? { categories: { $all: [filters.category] } } : {}
-  )
-    .skip(filters.page === 0 ? 0 : (filters.page - 1) * filters.limit)
-    .limit(filters.limit);
-
+  //Filter by category
+  let category = req.query.category;
+  if (category) {
+    obj.categories = { $all: [category] };
+  }
+  //Filter by name
+  let name = req.query.name;
+  if (name) {
+    obj.title = { $regex: name };
+  }
+  let package = await Status.find(obj);
+  let start = filters.page === 0 ? 0 : (filters.page - 1) * filters.limit;
   //Count number of status
-  filters.max = await Status.find(
-    filters.category ? { categories: { $all: [filters.category] } } : {}
-  ).countDocuments();
-
+  filters.max = package.length;
+  package = package.slice(start, start + filters.limit);
   //Add filters to final package
   package.filters = filters;
   res.send({ data: package, filters });

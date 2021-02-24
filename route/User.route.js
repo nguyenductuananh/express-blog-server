@@ -24,8 +24,9 @@ route.get("/:id", async (req, res) => {
 });
 
 route.post("/", async function (req, res) {
-  let package = req.body;
-  package = await User.create(package);
+  let data = req.body;
+  console.log(data);
+  let package = await User.find(data);
   res.send(package);
 });
 
