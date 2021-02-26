@@ -1,6 +1,7 @@
 const express = require("express");
 const route = express.Router();
 
+const Category = require("../model/Category.model");
 const Status = require("../model/Status.model");
 route.get("/", async (req, res) => {
   let filters = {};
@@ -21,14 +22,33 @@ route.get("/", async (req, res) => {
   if (name) {
     obj.title = { $regex: name };
   }
-  let package = await Status.find(obj);
-  let start = filters.page === 0 ? 0 : (filters.page - 1) * filters.limit;
-  //Count number of status
-  filters.max = package.length;
-  package = package.slice(start, start + filters.limit);
+  //Count
+  filters.max = await Status.countDocuments();
+  //Get data
+  let allCategories = await Category.find();
+  Status.find(obj)
+    .skip(filters.page === 0 ? 0 : (filters.page - 1) * filters.limit)
+    .limit(filters.limit)
+    .then((data) => {
+      let package = [...data];
+      for (let item of package) {
+        item.categories = item.categories.map((cate) => {
+          let result;
+          for (let c of allCategories) {
+            if (c._id.toString() === cate) {
+              result = c.name;
+            }
+          }
+          return result;
+        });
+      }
+      package.filters = filters;
+      // console.log(package);
+      res.send({ data: package, filters });
+    })
+    .catch((err) => console.log(err));
+  //Map category's id to category's name
   //Add filters to final package
-  package.filters = filters;
-  res.send({ data: package, filters });
 });
 route.get("/:id", async (req, res) => {
   let id = req.params.id;

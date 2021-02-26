@@ -7,7 +7,7 @@ route.get("/", async (req, res) => {
   //Page filter
   filters.page = parseInt(req.query.page) || 0;
   //Limit per page
-  filters.limit = parseInt(req.query.limit) || 6;
+  filters.limit = parseInt(req.query.limit) || 100;
   //Count number of status
   filters.max = await Category.countDocuments();
   let package = await Category.find()
